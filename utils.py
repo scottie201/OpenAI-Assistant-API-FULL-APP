@@ -3,33 +3,31 @@ import time
 import json
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-try:
-    from functions.main import *
-except ImportError:
-    print("No callable functions have been defined, you assistant should have no function calls as well")
-
 DELAY = 0.1
 
 def call_function(function_name: str, arguments):
-    if function_name in globals() and callable(globals()[function_name]):
-        function_to_call = globals()[function_name]
-        return function_to_call(**arguments)
+    # Placeholder implementation
+    if function_name == "function1":
+        # Your implementation for function1
+        return "Result of function1"
+    elif function_name == "function2":
+        # Your implementation for function2
+        return "Result of function2"
     else:
         raise ValueError(f"Function '{function_name}' does not exist")
 
-def get_assistant_response(prompt, client: OpenAI, assistant, thread, file_ids):
+def get_assistant_response(prompt, client: OpenAI, assistant, thread):
     # Add user message to thread
     client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content=prompt,
-        file_ids=file_ids
+        content=prompt
     )
 
     # Run the thread
     run = client.beta.threads.runs.create(
-        thread_id = thread.id,
-        assistant_id = assistant.id
+        thread_id=thread.id,
+        assistant_id=assistant.id
     )
 
     # Check for status
@@ -58,16 +56,13 @@ def get_assistant_response(prompt, client: OpenAI, assistant, thread, file_ids):
                 for action in required_actions["tool_calls"]:
                     func_name = action['function']['name']
                     arguments = json.loads(action['function']['arguments'])
-
-                    # print(f"Calling Function {func_name} with arguments {arguments}")
                     
-                    # This might create exception if the function is not defined
+                    # Call the function
                     output = call_function(func_name, arguments)
                     tool_outputs.append({
                             "tool_call_id": action['id'],
                             "output": output
                         })
-                    
                     
                 print(f"Submitting outputs back to the Assistant: {tool_outputs}")
                 client.beta.threads.runs.submit_tool_outputs(

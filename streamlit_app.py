@@ -44,12 +44,11 @@ if prompt:
         st.write(f"Attached files: {', '.join([OpenAI_file.filename for OpenAI_file in OpenAI_files])}")
 
     with st.chat_message("assistant"):
-        file_ids = [OpenAI_file.id for OpenAI_file in OpenAI_files]
-        response = get_assistant_response(prompt, client, assistant, st.session_state.thread, file_ids)
+        response = get_assistant_response(prompt, client, assistant, st.session_state.thread)
         st.markdown(response)
 
     # The assistant never outputs files
-    st.session_state.messages.append({"role": "assistant", "content": response, "file_ids": []})
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
     # Reset uploaded_files to None after processing the user's message
     st.session_state.uploaded_files = None
