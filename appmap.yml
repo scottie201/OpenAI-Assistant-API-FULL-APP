@@ -1,0 +1,4 @@
+appmap_dir: tmp/appmap
+language: python
+name: OpenAI-Assistant-API-FULL-APP
+packages: []
